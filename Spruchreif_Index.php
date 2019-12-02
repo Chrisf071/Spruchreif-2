@@ -3,10 +3,8 @@
     define ('host', 'localhost');
     define ('user', 'root');
     define ('pass', '');
-    define ('db', 'Spruchreif');
+    define ('db', 'Spruchreif'); 
     $con = mysqli_connect (host, user, pass, db);
-    
-    
 
     if(isset($_GET["save"])){
         if(!$con)
@@ -14,19 +12,17 @@
         else
         {echo "Es besteht eine Verbindung zur Datenbank von Spruchreif.";}
         
-        $date = date("d.m.Y", $timestamp);
+        $date = date('l jS \of F Y');
         $name = $_GET["name"];
         $phrase = $_GET["name"] . " went with " . $_GET["phrase_01"] . " " . $_GET["phrase_02"] . " to the cinema on " . $date . "\n";
         $mail = $_GET['mail'];
         
         $sql = 
-        "INSERT INTO 'phrases' ('phrase', 'recipient', 'mail') 
+        "INSERT INTO phrases (phrase, recipient, mail) 
         VALUES ('$phrase', '$name', '$mail')";
         
         mysqli_query($con, $sql); 
         
-        mysqli_close($con);
-
         header('Location: '.$_SERVER['PHP_SELF']);
         die;
     }
@@ -118,19 +114,25 @@
                 <!--Ausgabe der Textdatei der Sprüche aber nicht die der Namen-->
                 <li>   
                     <?php
-                        if(!$con)
-                            {echo "We can't load the phrases because there is no connection to the database.";}
-                        else
-                            {echo "These phrases where already saved in the database of Spruchreif: \n";}
-                            $stmt = mysqli_query($con, "SELECT * FROM 'phrases'");
-                    
-                            if(!$stmt)
-                                {echo "None";}
-                            else
-                                {$string = mysqli_fetch_array($stmt);
-                                 echo $string['phrase'];}
-                    
-                        mysqli_close($con);
+                        if(!$con){
+                            echo "We can't load the phrases because there is no connection to the database.";
+                        }
+                        else {
+                            echo "<p>These phrases where already saved in the database of Spruchreif: </p>\n";
+                            $stmt = "SELECT * FROM `phrases`";
+                            $res = mysqli_query($con, $stmt);
+
+                            if(!$res){
+                              echo "None";
+                            }
+                            else {
+                              while ($row = mysqli_fetch_array($res, MYSQLI_ASSOC)){
+                                echo "<p>&bdquo;" . $row['phrase'] . "&ldquo;</p>" ;
+                              }
+                            }
+                            mysqli_close($con);
+                        }
+
 
                     ?>
                 </li>
